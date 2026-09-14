@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>O2 Pós · Radar Comercial</title>
+<style>
+:root {
+  --bg: #0a0a0b;
+  --bg2: #111114;
+  --bg3: #18181c;
+  --bg4: #1f1f25;
+  --border: #2a2a32;
+  --border2: #3a3a45;
+  --text: #e8e6e1;
+  --muted: #9a968c;
+  --dim: #6b675e;
+  --amber: #d4a017;
+  --amber2: #f0c14b;
+  --amber-dim: rgba(212,160,23,.15);
+  --amber-glow: rgba(212,160,23,.35);
+  --red: #c45c4a;
+  --green: #5a9a6e;
+  --blue: #5a7a9a;
+  --radius: 10px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(212,160,23,.08), transparent),
+    radial-gradient(ellipse 40% 30% at 100% 0%, rgba(212,160,23,.04), transparent);
+}
+a { color: var(--amber2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Header */
+.header {
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+  padding: 1.25rem 1.5rem;
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(12px);
+  background: rgba(10,10,11,.92);
+}
+.header-inner {
+  max-width: 1400px; margin: 0 auto;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.5rem;
+  justify-content: space-between;
+}
+.brand { display: flex; flex-direction: column; gap: .15rem; }
+.brand h1 {
+  font-size: 1.35rem; font-weight: 700; letter-spacing: -.02em;
+  background: linear-gradient(135deg, var(--amber2), var(--amber));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.brand .meta { font-size: .8rem; color: var(--muted); }
+.counts { display: flex; gap: .75rem; flex-wrap: wrap; }
+.count-pill {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 999px; padding: .35rem .85rem;
+  font-size: .8rem; font-weight: 600;
+}
+.count-pill span { color: var(--amber2); font-family: var(--mono); }
+
+/* Layout */
+.wrap { max-width: 1400px; margin: 0 auto; padding: 1.25rem 1.5rem 3rem; }
+
+/* KPI */
+.kpis {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: .75rem;
+  margin-bottom: 1.5rem;
+}
+@media (max-width: 800px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+.kpi {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1rem 1.1rem;
+  position: relative; overflow: hidden;
+}
+.kpi::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--amber), transparent);
+}
+.kpi .label { font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: .25rem; }
+.kpi .value { font-size: 1.75rem; font-weight: 700; font-family: var(--mono); color: var(--amber2); line-height: 1.1; }
+.kpi .hint { font-size: .7rem; color: var(--dim); margin-top: .2rem; }
+
+/* Section titles */
+.section-title {
+  font-size: .75rem; text-transform: uppercase; letter-spacing: .1em;
+  color: var(--amber); margin: 1.5rem 0 .75rem; font-weight: 600;
+  display: flex; align-items: center; gap: .5rem;
+}
+.section-title::after {
+  content: ""; flex: 1; height: 1px; background: var(--border);
+}
+
+/* Ação agora */
+.urgent-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: .75rem; margin-bottom: .5rem;
+}
+.urgent-card {
+  background: linear-gradient(145deg, var(--bg3), var(--bg2));
+  border: 1px solid var(--border2);
+  border-radius: var(--radius); padding: 1rem;
+  cursor: pointer; transition: border-color .15s, transform .15s;
+  position: relative;
+}
+.urgent-card:hover { border-color: var(--amber); transform: translateY(-1px); }
+.urgent-card .rank {
+  position: absolute; top: .6rem; right: .75rem;
+  font-size: .65rem; color: var(--dim); font-family: var(--mono);
+}
+.urgent-card .score {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 2.4rem; height: 1.5rem; padding: 0 .4rem;
+  border-radius: 6px; font-family: var(--mono); font-weight: 700; font-size: .85rem;
+  background: var(--amber-dim); color: var(--amber2); border: 1px solid rgba(212,160,23,.3);
+  margin-bottom: .5rem;
+}
+.urgent-card h3 { font-size: .95rem; font-weight: 600; margin-bottom: .35rem; line-height: 1.3; }
+.urgent-card .tags { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .5rem; }
+.tag {
+  font-size: .65rem; padding: .15rem .45rem; border-radius: 4px;
+  background: var(--bg4); color: var(--muted); border: 1px solid var(--border);
+}
+.tag.fase-wrap { color: #e8b84a; border-color: rgba(232,184,74,.3); }
+.tag.fase-pos { color: #7ab0d4; border-color: rgba(122,176,212,.3); }
+.tag.fase-filmando { color: #8bc48a; border-color: rgba(139,196,138,.3); }
+.tag.fase-fomento { color: #b89ad4; border-color: rgba(184,154,212,.3); }
+.tag.novendor { color: var(--green); }
+.tag.alerta { color: var(--red); border-color: rgba(196,92,74,.3); }
+
+/* Filters */
+.filters {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1rem;
+  display: flex; flex-wrap: wrap; gap: .75rem; align-items: flex-end;
+  margin-bottom: 1rem; position: sticky; top: 72px; z-index: 90;
+  backdrop-filter: blur(8px); background: rgba(17,17,20,.95);
+}
+.filter-group { display: flex; flex-direction: column; gap: .25rem; flex: 1; min-width: 120px; }
+.filter-group label { font-size: .65rem; text-transform: uppercase; letter-spacing: .06em; color: var(--dim); }
+.filter-group select, .filter-group input {
+  background: var(--bg); border: 1px solid var(--border); color: var(--text);
+  border-radius: 6px; padding: .45rem .6rem; font-size: .85rem; font-family: var(--font);
+  outline: none; width: 100%;
+}
+.filter-group select:focus, .filter-group input:focus { border-color: var(--amber); }
+.filter-group.checkbox-group { flex-direction: row; align-items: center; gap: .5rem; min-width: auto; padding-bottom: .35rem; }
+.filter-group.checkbox-group label { text-transform: none; letter-spacing: 0; font-size: .8rem; color: var(--muted); cursor: pointer; }
+.filter-group.checkbox-group input { width: auto; accent-color: var(--amber); }
+.results-meta { font-size: .8rem; color: var(--muted); margin-bottom: .75rem; }
+.results-meta strong { color: var(--amber2); font-family: var(--mono); }
+
+/* Table */
+.table-wrap {
+  overflow-x: auto; border: 1px solid var(--border);
+  border-radius: var(--radius); background: var(--bg2);
+}
+table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+th {
+  text-align: left; padding: .65rem .75rem;
+  background: var(--bg3); color: var(--muted);
+  font-size: .65rem; text-transform: uppercase; letter-spacing: .06em;
+  font-weight: 600; border-bottom: 1px solid var(--border);
+  cursor: pointer; user-select: none; white-space: nowrap;
+}
+th:hover { color: var(--amber2); }
+th .sort-ind { opacity: .4; margin-left: .2rem; }
+th.sorted .sort-ind { opacity: 1; color: var(--amber); }
+td { padding: .65rem .75rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tr.lead-row { cursor: pointer; transition: background .1s; }
+tr.lead-row:hover { background: var(--bg3); }
+tr.lead-row.expanded { background: var(--bg3); }
+tr.detail-row td {
+  padding: 0; background: var(--bg);
+  border-bottom: 1px solid var(--border2);
+}
+.detail-panel {
+  padding: 1rem 1.25rem 1.25rem;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: .75rem 1.25rem;
+}
+.detail-field label {
+  display: block; font-size: .65rem; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--dim); margin-bottom: .15rem;
+}
+.detail-field .val { font-size: .82rem; color: var(--text); word-break: break-word; }
+.score-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 2.2rem; padding: .15rem .4rem; border-radius: 5px;
+  font-family: var(--mono); font-weight: 700; font-size: .8rem;
+}
+.score-high { background: var(--amber-dim); color: var(--amber2); }
+.score-mid { background: rgba(90,122,154,.2); color: #8ab0d0; }
+.score-low { background: rgba(106,103,94,.2); color: var(--muted); }
+.vendor-yes { color: var(--dim); }
+.vendor-no { color: var(--green); font-weight: 600; }
+.proj-name { font-weight: 600; }
+.expand-icon {
+  display: inline-block; width: 1rem; color: var(--dim);
+  font-size: .7rem; transition: transform .15s;
+}
+tr.expanded .expand-icon { transform: rotate(90deg); color: var(--amber); }
+
+/* Cards mobile */
+.cards-view { display: none; }
+@media (max-width: 700px) {
+  .table-wrap { display: none; }
+  .cards-view { display: block; }
+  .filters { top: 100px; }
+}
+.lead-card-m {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1rem; margin-bottom: .65rem;
+  cursor: pointer;
+}
+.lead-card-m.expanded { border-color: var(--amber); }
+.lead-card-m .top { display: flex; justify-content: space-between; align-items: flex-start; gap: .5rem; }
+.lead-card-m h3 { font-size: .95rem; margin: .35rem 0; }
+.lead-card-m .meta-row { font-size: .75rem; color: var(--muted); margin-bottom: .35rem; }
+.lead-card-m .detail-panel { margin-top: .75rem; padding-top: .75rem; border-top: 1px solid var(--border); }
+
+/* Excluded */
+.collapse-box {
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--bg2); margin-top: .5rem;
+}
+.collapse-head {
+  padding: .85rem 1rem; cursor: pointer; display: flex;
+  justify-content: space-between; align-items: center;
+  font-size: .85rem; font-weight: 600; color: var(--muted);
+  user-select: none;
+}
+.collapse-head:hover { color: var(--text); }
+.collapse-body { display: none; padding: 0 1rem 1rem; }
+.collapse-box.open .collapse-body { display: block; }
+.collapse-box.open .collapse-head .chev { transform: rotate(90deg); }
+.chev { transition: transform .15s; display: inline-block; margin-right: .4rem; color: var(--dim); }
+.excl-table { width: 100%; font-size: .8rem; border-collapse: collapse; }
+.excl-table th, .excl-table td { padding: .5rem .6rem; text-align: left; border-bottom: 1px solid var(--border); }
+.excl-table th { color: var(--dim); font-size: .65rem; text-transform: uppercase; }
+.excl-table td { color: var(--muted); }
+
+/* Footnote */
+.footnote {
+  margin-top: 2rem; padding: 1.25rem;
+  border-top: 1px solid var(--border);
+  font-size: .78rem; color: var(--muted);
+}
+.footnote h4 {
+  font-size: .7rem; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--amber); margin-bottom: .75rem; font-weight: 600;
+}
+.footnote ol { padding-left: 1.25rem; }
+.footnote li { margin-bottom: .4rem; }
+.footnote .src { margin-top: 1rem; font-size: .7rem; color: var(--dim); }
+
+.empty {
+  text-align: center; padding: 3rem; color: var(--dim);
+  border: 1px dashed var(--border); border-radius: var(--radius);
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <h1>O2 Pós · Radar Comercial</h1>
+      <div class="meta">Scout 14/09/2026 · fontes públicas · sem contato comercial</div>
+    </div>
+    <div class="counts">
+      <div class="count-pill">BR <span id="cnt-br">0</span></div>
+      <div class="count-pill">LatAm <span id="cnt-la">0</span></div>
+      <div class="count-pill">Total <span id="cnt-total">0</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="kpis">
+    <div class="kpi">
+      <div class="label">Urgentes</div>
+      <div class="value" id="kpi-urgentes">0</div>
+      <div class="hint">score ≥ 8,5 ou wrap</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Filmando</div>
+      <div class="value" id="kpi-filmando">0</div>
+      <div class="hint">em rodagem agora</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Fomento</div>
+      <div class="value" id="kpi-fomento">0</div>
+      <div class="hint">dinheiro carimbado / prep</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Sem vendor</div>
+      <div class="value" id="kpi-novendor">0</div>
+      <div class="hint">pós não anunciada</div>
+    </div>
+  </div>
+
+  <div class="section-title">Ação agora · top 8 urgentes</div>
+  <div class="urgent-grid" id="urgent-grid"></div>
+
+  <div class="section-title">Todos os leads</div>
+  <div class="filters">
+    <div class="filter-group">
+      <label>Região</label>
+      <select id="f-regiao">
+        <option value="Todos">Todos</option>
+        <option value="Brasil">Brasil</option>
+        <option value="LatAm">LatAm</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Fase</label>
+      <select id="f-fase">
+        <option value="Todas">Todas</option>
+        <option value="wrap">Wrap</option>
+        <option value="pos">Pós</option>
+        <option value="filmando">Filmando</option>
+        <option value="fomento">Fomento</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Score mínimo</label>
+      <select id="f-score">
+        <option value="0">Todos</option>
+        <option value="5">≥ 5</option>
+        <option value="6">≥ 6</option>
+        <option value="7">≥ 7</option>
+        <option value="8">≥ 8</option>
+        <option value="8.5">≥ 8,5</option>
+        <option value="9">≥ 9</option>
+      </select>
+    </div>
+    <div class="filter-group" style="flex:2;min-width:160px">
+      <label>Busca</label>
+      <input type="search" id="f-busca" placeholder="Projeto, produtora, plataforma…">
+    </div>
+    <div class="filter-group checkbox-group">
+      <input type="checkbox" id="f-novendor">
+      <label for="f-novendor">Só sem vendor</label>
+    </div>
+  </div>
+  <div class="results-meta"><strong id="visible-count">0</strong> leads visíveis</div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th data-sort="score" class="sorted">Score <span class="sort-ind">↓</span></th>
+          <th data-sort="projeto">Projeto <span class="sort-ind">↕</span></th>
+          <th data-sort="pais">País <span class="sort-ind">↕</span></th>
+          <th data-sort="fase">Fase <span class="sort-ind">↕</span></th>
+          <th data-sort="produtora">Produtora <span class="sort-ind">↕</span></th>
+          <th data-sort="plataforma">Plataforma <span class="sort-ind">↕</span></th>
+          <th>Demanda pós</th>
+          <th data-sort="vendor">Vendor? <span class="sort-ind">↕</span></th>
+          <th>Fonte</th>
+        </tr>
+      </thead>
+      <tbody id="leads-tbody"></tbody>
+    </table>
+  </div>
+  <div class="cards-view" id="cards-view"></div>
+  <div class="empty" id="empty-msg" style="display:none">Nenhum lead com esses filtros.</div>
+
+  <div class="section-title">Anti-sinais / excluídos</div>
+  <div class="collapse-box" id="excl-box">
+    <div class="collapse-head" onclick="toggleExcl()">
+      <span><span class="chev">▶</span> <span id="excl-count">0</span> projetos fora da janela comercial</span>
+      <span style="font-size:.75rem;color:var(--dim)">clique para expandir</span>
+    </div>
+    <div class="collapse-body">
+      <table class="excl-table">
+        <thead><tr><th>Região</th><th>Projeto</th><th>Motivo</th></tr></thead>
+        <tbody id="excl-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer class="footnote">
+    <h4>Playbook · tweaks desta rodada</h4>
+    <ol id="playbook-list"></ol>
+    <p class="src">Fontes: leads-brasil-inicial.md + leads-latam-inicial.md · Scout 14/09/2026 · Score = urgência × tamanho × VFX × (sem vendor). Apenas fatos publicados — nenhum projeto inventado.</p>
+  </footer>
+</main>
+
+<script>
+const LEADS = [{"id": "br-01", "regiao": "Brasil", "pais": "Brasil / Rio de Janeiro", "score": 9.0, "projeto": "Delegacia de Homicídios", "tipo": "Série policial / ficção", "produtora": "AfroReggae Audiovisual, Formata, Non Stop", "plataforma": "Disney+", "fase": "wrap", "faseLabel": "Wrap → pós", "datas": "Wrap anunciado 11/09/2026", "estreia": "2027", "demanda": "Conform + color + finishing + QC série; possível VFX crime/procedural moderado; master/IMF", "decisores": "Criação José Júnior; dir. geral Lucas Villamarim; dir. Isabella Gabaglia; elenco Marcello Melo Jr, Vanessa Giácomo", "vendor": false, "vendorNota": "Não encontrado em fontes públicas", "fonte": "Omelete", "fonteUrl": "https://www.omelete.com.br/series-tv/delegacia-de-homicidios-encerras-filmagens-confira", "confianca": "Fato publicado", "alerta": "Urgente"}, {"id": "br-02", "regiao": "Brasil", "pais": "Brasil / Goiânia + São Paulo", "score": 9.0, "projeto": "Marília", "tipo": "Longa / cinebiografia musical", "produtora": "Chatrone + Gullane", "plataforma": "Prime Video Original", "fase": "wrap", "faseLabel": "Wrap → pós", "datas": "Filmagem jul–set/2026; wrap 10/09/2026", "estreia": "2027", "demanda": "Color + conform + finishing musical; VFX/cleanup biopic; master/IMF; possível DCP", "decisores": "Dir. Dainara Toffoli; roteiro Carina Schulze, Patrícia Andrade; Marina Versos (Marília)", "vendor": false, "vendorNota": "Não", "fonte": "Telaviva / Folha F5", "fonteUrl": "https://telaviva.com.br/10/09/2026/prime-video-encerra-as-gravacoes-do-filme-original-prime-marilia/", "confianca": "Fato publicado", "alerta": "Urgente"}, {"id": "br-03", "regiao": "Brasil", "pais": "Brasil / Rio de Janeiro", "score": 8.0, "projeto": "Os Donos do Jogo (T2)", "tipo": "Série crime / drama", "produtora": "Paranoïd Filmes", "plataforma": "Netflix", "fase": "wrap", "faseLabel": "Wrap → pós", "datas": "Wrap anunciado ~31/08/2026; confirmado set/2026", "estreia": "T2 sem data", "demanda": "Pipeline série Netflix (conform, color, finishing, QC); VFX/crime moderado; risco vendor T1 locked", "decisores": "Criação Heitor Dhalia c/ Bernardo Barcellos, Bruno Passeri; elenco André Lamoglia, Mel Maia et al.", "vendor": false, "vendorNota": "Não anunciado para T2 (possível reuso T1)", "fonte": "Exame / Omelete", "fonteUrl": "https://exame.com/pop/os-donos-do-jogo-encerra-filmagens-da-2a-temporada-e-ganha-video-veja/", "confianca": "Fato publicado (wrap)", "alerta": "Haircut T2"}, {"id": "br-04", "regiao": "Brasil", "pais": "Brasil / Acre → pós RJ", "score": 8.0, "projeto": "A Estirada", "tipo": "Longa / thriller Amazônia–fronteira", "produtora": "Karla Martins (AC) + Samanta Sironi (RS); dir. Sérgio de Carvalho & Pedro von Krüger", "plataforma": "Independente / circuito", "fase": "wrap", "faseLabel": "Wrap → pós", "datas": "Última cena 30/08/2026; notícia 02/09/2026", "estreia": "fim 2027", "demanda": "Color + finishing floresta; VFX/3D potencial alto (fronteira, xamanismo); DCP; montador já nomeado", "decisores": "Montador André Sampaio; elenco Bruno Gagliasso, Adanilo", "vendor": false, "vendorNota": "Montagem nomeada; casa de pós/color/VFX não anunciada", "fonte": "AC24Horas", "fonteUrl": "https://ac24horas.com/2026/09/02/a-estirada-encerra-filmagens-no-acre-e-deve-chegar-as-telas-no-fim-de-2027/", "confianca": "Fato publicado", "alerta": "Urgente"}, {"id": "br-05", "regiao": "Brasil", "pais": "Brasil / Rio de Janeiro", "score": 8.0, "projeto": "Sábado à Noite", "tipo": "Série juvenil / romance musical", "produtora": "Panorâmica", "plataforma": "Gloob + Globoplay", "fase": "pos", "faseLabel": "Pós", "datas": "Wrap ~05/08/2026; notícias 08–10/08/2026", "estreia": "2026", "demanda": "Conform + color + finishing + musical sync; QC; master multiplataforma", "decisores": "Dir. Fernanda Kadlec; adapt. Babi Dewet; Théo Medon, Vittória Seixas", "vendor": false, "vendorNota": "Não", "fonte": "Telaviva / JWave / Cineweb", "fonteUrl": "https://telaviva.com.br/08/08/2026/gravacoes-da-serie-sabado-a-noite-sao-concluidas-no-rio-de-janeiro/", "confianca": "Fato publicado", "alerta": "Janela curta"}, {"id": "br-06", "regiao": "Brasil", "pais": "Brasil / Rio de Janeiro", "score": 7.0, "projeto": "Mãe Imperfeita", "tipo": "Série melodrama", "produtora": "A Fábrica", "plataforma": "Netflix", "fase": "filmando", "faseLabel": "Filmando", "datas": "Início gravações anunciado 19/08/2026", "estreia": "—", "demanda": "Pipeline série Netflix completo; melodrama típico (color/finishing); VFX leve", "decisores": "Dir. geral Rogério Gomes; prod. Cecília Grosso; EP Eduardo Vaisman, Katiuscha Mello, Mônica Juncken; Paolla Oliveira, Fabiula Nascimento", "vendor": false, "vendorNota": "Não", "fonte": "Telaviva / Noticiasdetv", "fonteUrl": "https://telaviva.com.br/19/08/2026/mae-imperfeita-nova-serie-de-melodrama-da-netflix-comeca-a-ser-gravada-no-rio-de-janeiro/", "confianca": "Fato publicado", "alerta": ""}, {"id": "br-07", "regiao": "Brasil", "pais": "Brasil / São Paulo", "score": 7.0, "projeto": "Casamento Aberto e Outras Coisas que Não Existem", "tipo": "Série comédia", "produtora": "Manas Filmes", "plataforma": "Netflix", "fase": "filmando", "faseLabel": "Filmando", "datas": "Início gravações anunciado 31/08/2026", "estreia": "—", "demanda": "Conform + color comedy; finishing; QC Netflix; VFX mínimo", "decisores": "Criação/roteiro Alexandre Machado; dir. José Alvarenga Jr.; Camila Pitanga, Sergio Guizé, Heloísa Périssé, Samantha Schmütz, Xamã, Otávio Muller", "vendor": false, "vendorNota": "Não", "fonte": "Estado de Minas / Bastidor Rio2C", "fonteUrl": "https://www.em.com.br/cultura/2026/08/7490895-camila-pitanga-e-sergio-guize-estrelam-nova-comedia-da-netflix.html", "confianca": "Fato publicado", "alerta": ""}, {"id": "br-08", "regiao": "Brasil", "pais": "Brasil / Belém (PA) + São Paulo", "score": 7.0, "projeto": "Brega Story", "tipo": "Série drama/comédia musical", "produtora": "Glaz Entretenimento", "plataforma": "Globoplay", "fase": "filmando", "faseLabel": "Filmando", "datas": "Início 01/07/2026; ainda filmando em ago/2026", "estreia": "2027", "demanda": "Finishing musical + color; possível VFX leve aparelhagem/shows; master Globoplay", "decisores": "Criação Carolina Alckmin, Denis Nielsen; dir. Daniela Carvalho, Pedro Amorim; EP Mayra Lucas; prod. Claudia Jouvin", "vendor": false, "vendorNota": "Não", "fonte": "Gshow / O Globo", "fonteUrl": "https://gshow.globo.com/globoplay/noticia/globoplay-mergulha-no-universo-das-aparelhagens-em-nova-serie-ambientada-no-para.ghtml", "confianca": "Fato publicado", "alerta": ""}, {"id": "br-09", "regiao": "Brasil", "pais": "Brasil", "score": 7.0, "projeto": "Resposta ao Tempo", "tipo": "Série drama/mistério", "produtora": "Não nomeada nas matérias Gshow", "plataforma": "Globoplay Original", "fase": "filmando", "faseLabel": "Filmando", "datas": "Primeiras imagens / início gravações ~02/09/2026", "estreia": "—", "demanda": "Pipeline série Globoplay; color/finishing; VFX leve", "decisores": "Escrita Lícia Manzo; Debora Bloch, Drica Moraes, Edvana Carvalho, Giulia Gam", "vendor": false, "vendorNota": "Não", "fonte": "Gshow", "fonteUrl": "https://gshow.globo.com/globoplay/noticia/debora-bloch-drica-moraes-edvana-carvalho-e-giulia-gam-posam-juntas-em-primeiras-imagens-de-resposta-ao-tempo.ghtml", "confianca": "Fato publicado (fase); produtora = lacuna", "alerta": ""}, {"id": "br-10", "regiao": "Brasil", "pais": "Brasil / São Paulo", "score": 7.0, "projeto": "Nerds versus Zumbis", "tipo": "Longa ficção/animação (VFX pesado)", "produtora": "Turnex Filmes", "plataforma": "Spcine PNAB Edital 08/2025 — Finalização (R$ 400 mil)", "fase": "fomento", "faseLabel": "Fomento / finalização", "datas": "Lista contemplados PNAB Spcine (edital 2025; lista ativa em 2026)", "estreia": "—", "demanda": "Alta probabilidade VFX/3D (zumbis); color; finishing; DCP", "decisores": "Proponente Turnex Filmes LTDA", "vendor": false, "vendorNota": "Não (edital é para finalizar)", "fonte": "Spcine PDF", "fonteUrl": "https://spcine.com.br/wp-content/uploads/LISTA-DE-CONTEMPLADOS-MOD-1-EDITAL-08-PNAB.pdf", "confianca": "Fato publicado (seleção)", "alerta": ""}, {"id": "br-11", "regiao": "Brasil", "pais": "Brasil", "score": 6.0, "projeto": "MED", "tipo": "Série médica", "produtora": "Paranoïd Filmes", "plataforma": "Netflix", "fase": "filmando", "faseLabel": "Em produção", "datas": "Anúncio “já em produção” 25/05/2026 (Rio2C)", "estreia": "—", "demanda": "Color + finishing hospitalar; VFX médico possível; pipeline Netflix", "decisores": "Prod. Manoel Rangel, Egisto Betti, Heitor Dhalia; criação/dir. Helena Petta & Ana Petta; Clara Moneke", "vendor": false, "vendorNota": "Não", "fonte": "Cinepop / Bastidor", "fonteUrl": "https://cinepop.com.br/netflix-anuncia-med-sua-primeira-serie-medica-brasileira-original-saiba-mais-740920/", "confianca": "Fato publicado", "alerta": ""}, {"id": "br-12", "regiao": "Brasil", "pais": "Brasil / São Paulo", "score": 6.0, "projeto": "Tremembé (T2)", "tipo": "Série drama / true crime ficcionalizado", "produtora": "Paranoïd Filmes", "plataforma": "Prime Video / Amazon MGM Studios", "fase": "filmando", "faseLabel": "Filmando", "datas": "Início filmagens 29/04/2026; possível wrap iminente", "estreia": "—", "demanda": "Pipeline série Prime; color/finishing; VFX leve; risco vendor T1", "decisores": "Dir. Vera Egito; EP Manoel Rangel, Egisto Betti, Heitor Dhalia; prod. assoc. Marina Ruy Barbosa", "vendor": false, "vendorNota": "Não anunciado para T2", "fonte": "Telaviva", "fonteUrl": "https://telaviva.com.br/29/04/2026/prime-video-inicia-filmagens-da-segunda-temporada-da-serie-original-tremembe/", "confianca": "Fato publicado", "alerta": "Risco vendor T1"}, {"id": "br-13", "regiao": "Brasil", "pais": "Brasil / São Paulo", "score": 6.0, "projeto": "Tramas Cruzadas", "tipo": "Série drama moda", "produtora": "Coração da Selva", "plataforma": "Globoplay Original", "fase": "filmando", "faseLabel": "Filmando", "datas": "Início abr/2026; ainda filmando jul/2026", "estreia": "2027", "demanda": "Conform + color fashion; finishing; QC Globoplay", "decisores": "Dir. Maria de Médicis; Reynaldo Gianecchini, Letícia Sabatella, Letícia Vieira, Geórgia Lee", "vendor": false, "vendorNota": "Não", "fonte": "Gshow", "fonteUrl": "https://gshow.globo.com/globoplay/noticia/reynaldo-gianecchini-leticia-sabatella-e-leticia-vieira-gravam-nova-serie-do-globoplay-no-theatro-municipal-de-sp.ghtml", "confianca": "Fato publicado", "alerta": ""}, {"id": "br-14", "regiao": "Brasil", "pais": "Brasil", "score": 6.0, "projeto": "A Estranha na Cama", "tipo": "Longa thriller erótico/psicológico (anos 80)", "produtora": "A Fábrica (+ Casa Montes / Raphael Montes)", "plataforma": "Netflix", "fase": "filmando", "faseLabel": "Filmando / possível wrap→pós", "datas": "Filmagem iniciada ~26/03/2026; sem wrap público em set/2026", "estreia": "2026/2027", "demanda": "Color period 80s; finishing; VFX leve period; master Netflix", "decisores": "Dir. Esmir Filho; Paolla Oliveira, Bella Campos, Emílio Dantas", "vendor": false, "vendorNota": "Não", "fonte": "About Netflix / Estadão/CNN", "fonteUrl": "https://about.netflix.com/", "confianca": "Fato publicado (início); fase atual = inferência", "alerta": ""}, {"id": "br-15", "regiao": "Brasil", "pais": "Brasil / SP", "score": 6.0, "projeto": "Cidade Luz", "tipo": "Longa ficção", "produtora": "Preta Porte Filmes", "plataforma": "Spcine PNAB 08/2025 Finalização (R$ 500 mil)", "fase": "fomento", "faseLabel": "Fomento / finalização", "datas": "Contemplado lista Spcine", "estreia": "—", "demanda": "Finishing + color + DCP/master", "decisores": "Juliana Vicente (proponente)", "vendor": false, "vendorNota": "Não", "fonte": "Spcine PDF", "fonteUrl": "https://spcine.com.br/wp-content/uploads/LISTA-DE-CONTEMPLADOS-MOD-1-EDITAL-08-PNAB.pdf", "confianca": "Fato publicado", "alerta": ""}, {"id": "br-16", "regiao": "Brasil", "pais": "Brasil / SP (Osasco)", "score": 6.0, "projeto": "Lusco Fusco", "tipo": "Longa drama", "produtora": "Macondo Filmes", "plataforma": "Spcine PNAB 08/2025 Finalização (R$ 500 mil)", "fase": "fomento", "faseLabel": "Fomento / finalização", "datas": "Contemplado; filmagem relatada em 2025", "estreia": "—", "demanda": "Finishing + color + DCP", "decisores": "Dir. Bel Bechara & Sandro Serpa; Allan Souza Lima", "vendor": false, "vendorNota": "Não", "fonte": "Spcine PDF / Cinepop", "fonteUrl": "https://spcine.com.br/wp-content/uploads/LISTA-DE-CONTEMPLADOS-MOD-1-EDITAL-08-PNAB.pdf", "confianca": "Fato publicado", "alerta": ""}, {"id": "br-17", "regiao": "Brasil", "pais": "Brasil / SP", "score": 6.0, "projeto": "Bando de Dois", "tipo": "Longa ficção", "produtora": "Latinamerica Entretenimento Internacional", "plataforma": "Spcine PNAB 08/2025 Finalização (R$ 500 mil)", "fase": "fomento", "faseLabel": "Fomento / finalização", "datas": "Contemplado", "estreia": "—", "demanda": "Finishing + color + DCP", "decisores": "Luiza Shelling Tubaldini (proponente)", "vendor": false, "vendorNota": "Não", "fonte": "Spcine PDF", "fonteUrl": "https://spcine.com.br/wp-content/uploads/LISTA-DE-CONTEMPLADOS-MOD-1-EDITAL-08-PNAB.pdf", "confianca": "Fato publicado", "alerta": ""}, {"id": "br-18", "regiao": "Brasil", "pais": "Brasil / Palmas (TO)", "score": 5.0, "projeto": "O Aroma da Pitanga (título provisório)", "tipo": "Longa drama", "produtora": "Bananeira Filmes (Vânia Catani); coprod. Cunhã Porã + Paris Entretenimento", "plataforma": "Independente / Paris Filmes", "fase": "pos", "faseLabel": "Pós", "datas": "Wrap 12/05/2026 (~4 meses em pós)", "estreia": "—", "demanda": "Color art-house (DoP Lula Carvalho); finishing; DCP; VFX mínimo esperado", "decisores": "Dir. Lisandro Alonso; Wagner Moura", "vendor": false, "vendorNota": "Não", "fonte": "Telaviva", "fonteUrl": "https://telaviva.com.br/12/05/2026/foram-concluidas-as-filmagens-de-o-aroma-de-pitanga-com-wagner-moura/", "confianca": "Fato publicado", "alerta": ""}, {"id": "br-19", "regiao": "Brasil", "pais": "Brasil / Rio de Janeiro", "score": 5.0, "projeto": "Dom de Iludir", "tipo": "Série melodrama/suspense", "produtora": "Conspiração (+ assoc. Amaia)", "plataforma": "Netflix", "fase": "pos", "faseLabel": "Pós avançada / finishing", "datas": "Filmagem desde nov/2025; teaser oficial 10/09/2026", "estreia": "ainda em 2026", "demanda": "Color + finishing premium; QC; janela curta até lançamento 2026", "decisores": "Dir. geral Mauro Mendonça Filho; criação Diane Maia, Mirna Nogueira; prod. Renata Brandão, Luísa Barbosa, Tania Pacheco", "vendor": false, "vendorNota": "Não nomeado; Netflix costuma fechar pós cedo — baixo fit", "fonte": "Tudum Netflix", "fonteUrl": "https://www.netflix.com/tudum/pt-br/artigos/dom-de-iludir-teaser-temporada-1", "confianca": "Fato publicado", "alerta": "Janela curta / baixo fit"}, {"id": "la-01", "regiao": "LatAm", "pais": "Argentina + Uruguay", "score": 9.5, "projeto": "El futuro es nuestro", "tipo": "Minissérie ficção distópica (8 eps); Philip K. Dick", "produtora": "K&S Films (AR) + K&S Films Uruguay", "plataforma": "Netflix Original LatAm", "fase": "pos", "faseLabel": "Wrap → em pós", "datas": "Wrap UY mai–jun/2026; rodagem desde out/2025", "estreia": "2H 2027", "demanda": "Alta–muito alta: mundo 2047, VFX/ambientes, color premium, finish/master IMF multi-país", "decisores": "Hugo Sigman / Matías Mosteirin; Mariana Secco (K&S Uruguay); Netflix LatAm", "vendor": false, "vendorNota": "Não nomeado", "fonte": "TodoTV News / La Diaria", "fonteUrl": "https://todotvnews.com/en/netflix-and-ks-films-arrive-in-uruguay-to-film-el-futuro-es-nuestro/", "confianca": "Alta", "alerta": "Urgente"}, {"id": "la-02", "regiao": "LatAm", "pais": "México + Europa", "score": 8.5, "projeto": "Carlota", "tipo": "Série de época / drama histórico", "produtora": "Sony Pictures Television", "plataforma": "HBO Max", "fase": "wrap", "faseLabel": "Wrap → início de pós", "datas": "Wrap anunciado ~10 jun 2026 (PRODU); 4 meses rodagem", "estreia": "2027", "demanda": "Alta: época (palácios, VFX period), color, finish, masters multi-território Max", "decisores": "Carlos Quintanilla (SPT); dirs. Ana Lorena Pérez Ríos, José Manuel Cravioto; Mariano César (HBO Max LatAm)", "vendor": false, "vendorNota": "Não nomeado (SPT/Max podem ter vendors preferenciais)", "fonte": "PRODU", "fonteUrl": "https://www.produ.com/television/noticias/carlota-produccion-de-spt-que-debuta-en-2027-por-hbo-max-en-latam-concluyo-rodaje-y-revela-primer-vistazo-tras-camaras/", "confianca": "Alta", "alerta": "Urgente"}, {"id": "la-03", "regiao": "LatAm", "pais": "Argentina (CABA / GBA)", "score": 8.5, "projeto": "Villaflor", "tipo": "Longa ficção / thriller político", "produtora": "La Unión de los Ríos (AR) + Maneki Films (FR)", "plataforma": "Netflix", "fase": "pos", "faseLabel": "Fin de rodaje → em pós", "datas": "~12 semanas; wrap mid-jun 2026", "estreia": "2027", "demanda": "Média–alta: período 1976–77, reconstituição histórica, color/look, finish/IMF", "decisores": "Santiago Mitre; Agustina Llambi Campbell; Netflix AR/LatAm", "vendor": false, "vendorNota": "Não nomeado", "fonte": "GPS Audiovisual", "fonteUrl": "https://gpsaudiovisual.com/2026/06/12/final-del-rodaje-de-villaflor-thriller-politico-de-santiago-mitre-con-veronica-llinas-y-peter-lanzani-en-los-roles-de-azucena-villaflor-y-alfredo-astiz/", "confianca": "Alta", "alerta": "Urgente"}, {"id": "la-04", "regiao": "LatAm", "pais": "Chile", "score": 8.0, "projeto": "El Salar de Kenchikka", "tipo": "Série ficção + ação real + animação 3D/Machinima", "produtora": "Rodrigo Bastidas Producciones SPA", "plataforma": "Fondo CNTV 2025 — $602.117.582 CLP", "fase": "fomento", "faseLabel": "Fomento / prep", "datas": "Adjudicação CNTV 7 out 2025", "estreia": "—", "demanda": "Muito alta em VFX/3D/integração: pipeline híbrido live-action + mundos virtuais", "decisores": "Dirs. Matías Bize + Alejandro Bazzano; prod. Rodrigo Bastidas; guion Rodrigo Cuevas", "vendor": false, "vendorNota": "Não nomeado", "fonte": "CNTV oficial", "fonteUrl": "https://cntv.cl/consejo-nacional-de-television-da-a-conocer-los-17-proyectos-adjudicados-por-el-fondo-cntv-2025/", "confianca": "Alta (financiamento); média na fase", "alerta": "Pipeline VFX"}, {"id": "la-05", "regiao": "LatAm", "pais": "México", "score": 7.5, "projeto": "Cábula", "tipo": "Longa ficção / comédia de autor", "produtora": "Cuadernos de Cine (Nicolás Celis) + Elastica Films (ES)", "plataforma": "Independente / gap-financing (Venice)", "fase": "wrap", "faseLabel": "Wrap + gap financing / finishing", "datas": "Variety exclusive 12 set 2026; Venice Gap 4–6 set 2026", "estreia": "—", "demanda": "Média–alta finishing: color, sound, master; possível VFX leve", "decisores": "Lila Avilés (dir.); Nicolás Celis; Maria Zamora (Elastica)", "vendor": false, "vendorNota": "Não nomeado", "fonte": "Variety", "fonteUrl": "https://variety.com/2026/film/global/totem-lila-aviles-cabula-first-look-venice-1236849524/", "confianca": "Alta", "alerta": "Gap financing"}, {"id": "la-06", "regiao": "LatAm", "pais": "Chile", "score": 7.5, "projeto": "Prat, el hombre detrás del héroe", "tipo": "Minissérie histórica (6×50')", "produtora": "MAZAL Producciones", "plataforma": "Fondo CNTV 2025 — $603.873.249 CLP", "fase": "fomento", "faseLabel": "Fomento / prep", "datas": "Adjudicação out/2025", "estreia": "—", "demanda": "Alta VFX/period: naval/bélico; color épico; finish TV", "decisores": "Dir. Sebastián Araya; guion Víctor Carrasco; prod. Andrea Undurraga", "vendor": false, "vendorNota": "Não nomeado", "fonte": "CNTV oficial", "fonteUrl": "https://cntv.cl/consejo-nacional-de-television-da-a-conocer-los-17-proyectos-adjudicados-por-el-fondo-cntv-2025/", "confianca": "Alta (fundo); média (fase)", "alerta": ""}, {"id": "la-07", "regiao": "LatAm", "pais": "Colombia (Bogotá)", "score": 7.0, "projeto": "La Corona", "tipo": "Longa ficção", "produtora": "Secuoya Studios + Black Sheep + Startling + Infinity Hill + Runaway Films", "plataforma": "Coprodução internacional", "fase": "filmando", "faseLabel": "Filmando", "datas": "Inicio de rodaje 20 jul 2026", "estreia": "—", "demanda": "Média–alta (drama social; finish/color; VFX moderado)", "decisores": "Dir. Anahí Berneri; Natalia Reyes; Fundação Acción Interna", "vendor": false, "vendorNota": "Não nomeado", "fonte": "PRODU", "fonteUrl": "https://www.produ.com/cine/noticias/secuoya-black-sheep-startling-infinity-hill-y-runaway-films-arrancan-el-rodaje-de-la-corona/", "confianca": "Alta", "alerta": ""}, {"id": "la-08", "regiao": "LatAm", "pais": "Colombia (Barranquilla)", "score": 7.0, "projeto": "En diciembre llegaban las brisas", "tipo": "Série period drama", "produtora": "Dynamo (CO)", "plataforma": "Netflix + incentivo CINA Colombia", "fase": "pos", "faseLabel": "Pós / late production", "datas": "Rodagem iniciada set/2025; sem wrap público confirmado set/2026", "estreia": "—", "demanda": "Alta period look/color; VFX period enhancement; finish Netflix", "decisores": "Dirs. Claudia Pedraza, Rafael Martínez; EP Angélica Guerra, Adriana Aparicio, Michel Rubén", "vendor": false, "vendorNota": "Não nomeado (Dynamo/Netflix podem ter pipeline)", "fonte": "Señal News", "fonteUrl": "https://senalnews.com/es/contenidos/netflix-inicia-la-produccion-de-la-serie-colombiana-en-diciembre-llegaban-las-brisas", "confianca": "Alta existência; média na fase", "alerta": ""}, {"id": "la-09", "regiao": "LatAm", "pais": "Chile", "score": 7.0, "projeto": "Una Noche de San Valentín", "tipo": "Série ficção 4 eps", "produtora": "Waiki Films (Región de Valparaíso)", "plataforma": "Fondo CNTV 2025 — $585.118.407 CLP", "fase": "fomento", "faseLabel": "Fomento", "datas": "Adjudicação out/2025", "estreia": "—", "demanda": "Média–alta: planos sequência + VFX aurora; color; finish", "decisores": "Dir./guion Boris Quercia; prod. Andrés Matamala", "vendor": false, "vendorNota": "Não nomeado", "fonte": "CNTV oficial", "fonteUrl": "https://cntv.cl/consejo-nacional-de-television-da-a-conocer-los-17-proyectos-adjudicados-por-el-fondo-cntv-2025/", "confianca": "Alta (fundo)", "alerta": ""}, {"id": "la-10", "regiao": "LatAm", "pais": "Chile (+ Peru)", "score": 6.5, "projeto": "Guardianes del Pasado: Las Momias Chinchorro", "tipo": "Minissérie 3 eps — doc + ficção + animação", "produtora": "Puertovisual LTDA", "plataforma": "Fondo CNTV 2025 — $231.323.197 CLP", "fase": "fomento", "faseLabel": "Fomento", "datas": "Adjudicação out/2025", "estreia": "—", "demanda": "Alta integração animação/doc/ficção", "decisores": "Dir. Fernando Garabedian; guion Benito Escobar; prod. María Ignacia Imboden", "vendor": false, "vendorNota": "Não nomeado", "fonte": "CNTV oficial", "fonteUrl": "https://cntv.cl/consejo-nacional-de-television-da-a-conocer-los-17-proyectos-adjudicados-por-el-fondo-cntv-2025/", "confianca": "Alta", "alerta": ""}, {"id": "la-11", "regiao": "LatAm", "pais": "Chile", "score": 6.5, "projeto": "¿Has visto a Pablo?", "tipo": "Minissérie ficção política / memória ditadura", "produtora": "Octubre Producciones de Cine y TV LTDA", "plataforma": "Fondo CNTV 2025 — $602.185.490 CLP", "fase": "fomento", "faseLabel": "Fomento", "datas": "Adjudicação out/2025", "estreia": "—", "demanda": "Média (period dual timeline; color; finish)", "decisores": "Dir. Tatiana Gaviola; prod. Mauricio Dupuis; guion Josefina Fernández", "vendor": false, "vendorNota": "Não nomeado", "fonte": "CNTV oficial", "fonteUrl": "https://cntv.cl/consejo-nacional-de-television-da-a-conocer-los-17-proyectos-adjudicados-por-el-fondo-cntv-2025/", "confianca": "Alta", "alerta": ""}, {"id": "la-12", "regiao": "LatAm", "pais": "Argentina", "score": 6.5, "projeto": "INCAA — Largometrajes Ficción/Doc 2025 (lote)", "tipo": "Largas ficção/documental — cluster", "produtora": "Várias (Películas V, Lescano, Rita Cine, Año Cero, Diego Castro, Wankacine, Pensar con las Manos, Groncho, Lumencine, Gustavo Alonso)", "plataforma": "INCAA — Resolución 147/2026", "fase": "fomento", "faseLabel": "Fomento / prep", "datas": "Ganhadores publicados 12 mai 2026", "estreia": "—", "demanda": "Média por título (conform; color; master); priorizar ficções com potencial VFX", "decisores": "Kurusú, Pálpitos, Sueñan las arañas, Roger suelto, Tira tiros, La última frontera, Cuento de Navidad, Lo ideal, Lita, Un balcón", "vendor": false, "vendorNota": "Não nomeado", "fonte": "INCAA", "fonteUrl": "https://www.incaa.gob.ar/ganadores-del-concurso-de-largometrajes-ficcion-y-documental-2025/", "confianca": "Alta", "alerta": "Cluster pipeline AR"}, {"id": "la-13", "regiao": "LatAm", "pais": "Pan-Ibero", "score": 6.5, "projeto": "Ibermedia Coproducción 2025 — títulos prioritários", "tipo": "Largas ficção/doc/animação — cluster", "produtora": "Várias (Aurora Cine, Nu Revedup, Tarea Fina, Oh my Gomez!, Diego Pino et al.)", "plataforma": "Programa Ibermedia — XXXV Reunión", "fase": "fomento", "faseLabel": "Desenvolvimento / prep / produção", "datas": "Selecionados nov/2025", "estreia": "—", "demanda": "Variável; Los pozos del diablo e Montevideo vampiro merecem follow-up VFX", "decisores": "AR: Deriva, La escuela pesada, Los erizos, Zona norte; CL: Los pozos del diablo; CO/MX/PE/DO/UY títulos listados", "vendor": false, "vendorNota": "Não nomeado (exceto WIP awards parciais)", "fonte": "Ibermedia / LatAm Cinema", "fonteUrl": "https://www.programaibermedia.com/estos-son-los-proyectos-seleccionados-en-nuestra-convocatoria-2025/", "confianca": "Alta", "alerta": "Cluster"}, {"id": "la-14", "regiao": "LatAm", "pais": "México", "score": 6.0, "projeto": "FOCINE 2026 — Largas ficción + animação", "tipo": "Largas ficção/animação — cluster", "produtora": "Várias (GEA, Globar 42, Casadelou, Maliarts et al.)", "plataforma": "IMCINE FOCINE 2026", "fase": "fomento", "faseLabel": "Autorizados → prep", "datas": "Resultados ~30 abr 2026", "estreia": "—", "demanda": "Animação = alta; ficções = média (pipeline 12–24m)", "decisores": "Aída, La cueva, Last weekend, Manos Negras, Pieles de Arena, Torreoncitos; anim: El origen…, Hanta, Josefina…, Venado azul, Luces de abril", "vendor": false, "vendorNota": "Não nomeado", "fonte": "IMCINE PDF", "fonteUrl": "https://www.imcine.gob.mx/focine", "confianca": "Alta", "alerta": "Cluster MX"}, {"id": "la-15", "regiao": "LatAm", "pais": "Colombia", "score": 6.0, "projeto": "CINA Colombia 2025–26 — pipeline streamer", "tipo": "Oportunidade estrutural / incentivo", "produtora": "Dynamo; Jaguar Bite; Estudios RCN; TIS Studios et al.", "plataforma": "CINA / Proimágenes / FFC", "fase": "fomento", "faseLabel": "Mix: pós/produção", "datas": "26 projetos aprovados até 31 jul 2026; cupo 2026 COP 350.000M", "estreia": "—", "demanda": "Estrutural: CINA cobre serviços incl. pós; 7 projetos pós + 3 animação 2025", "decisores": "Proimágenes / Comisión Fílmica (Diego Bustos); títulos: Palacio, 52nd State, DOC, Perfil Falso T3, Medusa T2", "vendor": false, "vendorNota": "Parcialmente local; overflow VFX possível", "fonte": "Comisión Fílmica Colombia", "fonteUrl": "https://comisionfilmicacolombia.com/incentivos/certificado-tributario-cina/", "confianca": "Alta no incentivo; baixa na lista nominal 2026", "alerta": "Estrutural"}, {"id": "la-16", "regiao": "LatAm", "pais": "CL / CR / CO / PE (Ibero)", "score": 6.0, "projeto": "Ventana Sur 2025 — Primer Corte / WIP", "tipo": "WIP / Primer Corte — finishing", "produtora": "Várias", "plataforma": "Ventana Sur", "fase": "pos", "faseLabel": "Pós avançada / finishing", "datas": "Winners 2025", "estreia": "—", "demanda": "Alta urgência finishing; janela estreita (prêmios in-kind)", "decisores": "Los Pozos del Diablo (Boisier); Madre Pájaro; Donde comienza el río; La Otra Orilla", "vendor": true, "vendorNota": "Parcialmente sim (Titra, Colorfront, Visom, The End)", "fonte": "Ventana Sur", "fonteUrl": "https://ventana-sur.com/2025-proyectos-ganadores/", "confianca": "Alta", "alerta": "Vendor parcial locked"}, {"id": "la-17", "regiao": "LatAm", "pais": "Chile / Ibero", "score": 5.5, "projeto": "SANFIC Industria 2025 — WIP / Series Labs", "tipo": "WIP / desenvolvimento", "produtora": "Várias", "plataforma": "SANFIC Industria", "fase": "pos", "faseLabel": "WIP / desenvolvimento", "datas": "ago/2025", "estreia": "—", "demanda": "Color/sound; overflow possível", "decisores": "O_Mostro; Africa Express; Valijero; Cocaína Negra; El Internacional; El Evangelio según Bárbara", "vendor": true, "vendorNota": "Vários já premiados (Yagán, Chemistry)", "fonte": "Mundo Películas", "fonteUrl": "https://www.mundopeliculas.tv/2025/08/23/sanfic-industria-2025-ganadores/", "confianca": "Alta", "alerta": "Vendor parcial"}, {"id": "la-18", "regiao": "LatAm", "pais": "México / Ibero", "score": 5.0, "projeto": "Guadalajara Construye 2025", "tipo": "WIP postprodução iberoamericana", "produtora": "Várias", "plataforma": "FICG / Guadalajara Construye", "fase": "pos", "faseLabel": "Pós (prêmios jun/2025)", "datas": "jun/2025", "estreia": "—", "demanda": "Overflow/QC/master ainda possível", "decisores": "Aquí hay dragones; Tierras Niñas; Génesis; Los nadadores; 8 maneras de morir; O_Monstro", "vendor": true, "vendorNota": "Sim, parcial: Estudios Churubusco, Eterno VFX, Hasan, Cluster, OA Sonido, Yagán, The End", "fonte": "FICG", "fonteUrl": "https://ficg.mx/anuncian-a-ganadores-del-programa-de-industria-guadalajara-construye/", "confianca": "Alta", "alerta": "Vendors atribuídos"}, {"id": "la-19", "regiao": "LatAm", "pais": "México", "score": 5.0, "projeto": "FOCINE 2026 — modalidade Postproducción", "tipo": "29 projetos autorizados em pós", "produtora": "Várias (já com apoio IMCINE)", "plataforma": "IMCINE FOCINE 2026 — Postproducción", "fase": "pos", "faseLabel": "Pós subsidiada", "datas": "Autorizados 2026 (29 de 126 inscritos)", "estreia": "—", "demanda": "Baixa prioridade direta; monitorar overflow VFX / IMF", "decisores": "Amostra: El día de los primeros frutos; El frío de Alaska; Huevero; Niños de barro; Primavera; Testigos; Una temporada en el infierno; El Milagro", "vendor": true, "vendorNota": "Provavelmente vendor local em negociação", "fonte": "PDF FOCINE 2026", "fonteUrl": "https://www.imcine.gob.mx/focine", "confianca": "Alta", "alerta": "Já subsidiados"}, {"id": "la-20", "regiao": "LatAm", "pais": "Chile", "score": 5.0, "projeto": "Animação CNTV infantil/preescolar", "tipo": "Animação cluster", "produtora": "Zumbástico; We are South; Luzoro y Ortega; Estudio Lunes", "plataforma": "Fondo CNTV 2025", "fase": "fomento", "faseLabel": "Fomento", "datas": "Financiados out/2025", "estreia": "—", "demanda": "Alta pipeline animação (studios costumam internalizar)", "decisores": "Coco y Yoko; Petra; Dani explica la ficción; Mi (ex) mejor amigo imaginario", "vendor": false, "vendorNota": "Não nomeado (internalização provável)", "fonte": "CNTV oficial", "fonteUrl": "https://cntv.cl/consejo-nacional-de-television-da-a-conocer-los-17-proyectos-adjudicados-por-el-fondo-cntv-2025/", "confianca": "Alta", "alerta": ""}, {"id": "la-21", "regiao": "LatAm", "pais": "Uruguay", "score": 5.0, "projeto": "Uruguay PUA Cash Rebate + K&S pipeline", "tipo": "Oportunidade estrutural", "produtora": "K&S Films Uruguay et al.", "plataforma": "ACAU/PUA Cash Rebate Internacional 2025–26", "fase": "fomento", "faseLabel": "Janela rebate + pipeline", "datas": "Rebate aberto; K&S outro projeto UY a partir de ago/2026", "estreia": "—", "demanda": "Serviços produção/pós elegíveis; finishing/VFX cross-border BR–UY", "decisores": "ACAU (Gisella Previtali); K&S Uruguay (Mariana Secco); Matías Mosteirin", "vendor": false, "vendorNota": "Segundo projeto K&S sem título público", "fonte": "ACAU / La Diaria", "fonteUrl": "https://www.acau.gub.uy/innovaportal/v/381/1/acau/ya-estan-disponibles-las-bases-de-las-convocatorias-cash-rebate-internacional-2025-del-programa-uruguay-audiovisual.html", "confianca": "Média", "alerta": "Estrutural"}, {"id": "la-22", "regiao": "LatAm", "pais": "Pan-Ibero", "score": 4.0, "projeto": "Ibermedia 2026 — apresentados (pipeline futuro)", "tipo": "Watchlist — 539 projetos apresentados", "produtora": "—", "plataforma": "Programa Ibermedia convocatoria 2026", "fase": "fomento", "faseLabel": "Apresentados (sem seleção)", "datas": "Resultados ainda não publicados em set/2026", "estreia": "—", "demanda": "Watchlist; re-checar quando sair seleção", "decisores": "ES 77, AR 67, BR 64, CO 46, MX 43, CL 40", "vendor": false, "vendorNota": "N/A", "fonte": "Ibermedia", "fonteUrl": "https://www.programaibermedia.com/aqui-estan-las-listas-con-los-539-proyectos-presentados-a-nuestra-convocatoria-2026/", "confianca": "Alta no volume; N/A em ganhadores", "alerta": "Watchlist"}];
+const EXCLUIDOS = [{"projeto": "Emergência 53 (Globoplay / Conspiração)", "motivo": "Já lançada ago/2026", "regiao": "Brasil"}, {"projeto": "Brasil 70 – A Saga do Tri (Netflix / O2 Filmes)", "motivo": "Lançada mai/2026; pós interna/grupo + IA; não é lead externo", "regiao": "Brasil"}, {"projeto": "Fúria (Netflix / Zola Filmes)", "motivo": "Lançada jul/2026", "regiao": "Brasil"}, {"projeto": "Habeas Corpus (Netflix / Café Royal)", "motivo": "Estreia anunciada 23/09/2026 — pós essencialmente fechada", "regiao": "Brasil"}, {"projeto": "100 Dias (Amyr Klink / Carlos Saldanha)", "motivo": "Estreia 29/10/2026 — late finishing only", "regiao": "Brasil"}, {"projeto": "Verônika com K", "motivo": "Filmada 2022–23; estreia 2026 — fora da janela de necessidade de pós", "regiao": "Brasil"}, {"projeto": "Reality / low-budget shorts", "motivo": "Fora do filtro do brief", "regiao": "Brasil"}, {"projeto": "Betty la fea T3 (Prime / RCN)", "motivo": "Estreia global ~28 ago 2026 — já lançado", "regiao": "LatAm"}, {"projeto": "Cien años de soledad Parte 2 (Netflix)", "motivo": "Estreia anunciada ago/2026 — fora da janela pós comercial", "regiao": "LatAm"}, {"projeto": "The Last Photograph (Zack Snyder / Jaguar Bite)", "motivo": "Premiere TIFF ~13 set 2026 — picture lock", "regiao": "LatAm"}, {"projeto": "Nueve reinas (Netflix / Lazona)", "motivo": "Rodagem em Madrid (ES) — geo fora do core LatAm O2", "regiao": "LatAm"}, {"projeto": "Palacio (Netflix / Dynamo)", "motivo": "Fontes conflitantes; risco alto de já estar fechado — revalidar", "regiao": "LatAm"}, {"projeto": "FOCINE/EFICINE cortometrajes", "motivo": "Fora do filtro premium/feature-series", "regiao": "LatAm"}, {"projeto": "INCAA Documental Digital lote (mar/2026)", "motivo": "Muitos docs digitais low-ticket — qualificar só se premium", "regiao": "LatAm"}, {"projeto": "Guadalajara/SANFIC winners com vendor in-kind", "motivo": "Já têm fornecedor parcial (também listados como leads com vendor=sim)", "regiao": "LatAm"}];
+const PLAYBOOK = ["Priorizar Telaviva + Omelete + Gshow (BR) e PRODU + Señal + Variety Latino (LatAm) como radar semanal de wrap/filmando. Filme B / Meio & Mensagem secundários.", "Spcine/RioFilme editais de FINALIZAÇÃO (PNAB) = fila A — dinheiro carimbado para pós. FSA Seletivo fica em fila B até cruzar com notícia de filmagem.", "Film commissions não publicam lista nominal; cruzar produtoras-alvo via LinkedIn + Tudum/Rio2C. Em T2+/franchise, haircut por vendor lock da T1.", "CINA/Proimágenes: monitorar lista nominal completa dos 26 projetos 2026 (7 pós + 3 animação). CNTV Chile: recontactar 6–9 meses após fallo.", "WIP markets (Ventana Sur, Guadalajara, SANFIC): filtrar sem vendor vs já premiados; ofertar overflow VFX / DCP-IMF / QC.", "INCAA largas mai/2026 = outreach Q4 2026–Q1 2027; desarrollo cedo demais. MX: baixar PDF EFICINE Hacienda completo na próxima rodada.", "PE/DO: pouco dado público — complementar com trade press local + film commissions + LinkedIn. Nunca inventar fase.", "Geo O2: AR/UY + MX + CO streamers primeiro; CL CNTV premium VFX; ES só se co-pro LatAm major."];
+
+let sortKey = "score";
+let sortDir = -1; // desc
+let expandedId = null;
+
+function scoreClass(s) {
+  if (s >= 8) return "score-high";
+  if (s >= 6) return "score-mid";
+  return "score-low";
+}
+function faseTag(fase) {
+  return "fase-" + fase;
+}
+function isUrgent(l) {
+  return l.score >= 8.5 || l.fase === "wrap";
+}
+function esc(s) {
+  if (s == null) return "";
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function trunc(s, n) {
+  if (!s) return "—";
+  return s.length > n ? s.slice(0, n) + "…" : s;
+}
+
+function initCounts() {
+  const br = LEADS.filter(l => l.regiao === "Brasil").length;
+  const la = LEADS.filter(l => l.regiao === "LatAm").length;
+  document.getElementById("cnt-br").textContent = br;
+  document.getElementById("cnt-la").textContent = la;
+  document.getElementById("cnt-total").textContent = LEADS.length;
+  document.getElementById("kpi-urgentes").textContent = LEADS.filter(isUrgent).length;
+  document.getElementById("kpi-filmando").textContent = LEADS.filter(l => l.fase === "filmando").length;
+  document.getElementById("kpi-fomento").textContent = LEADS.filter(l => l.fase === "fomento").length;
+  document.getElementById("kpi-novendor").textContent = LEADS.filter(l => !l.vendor).length;
+}
+
+function renderUrgent() {
+  const top = [...LEADS].sort((a,b) => b.score - a.score || (a.fase==="wrap"?-1:1)).slice(0, 8);
+  const grid = document.getElementById("urgent-grid");
+  grid.innerHTML = top.map((l, i) => `
+    <div class="urgent-card" onclick="scrollToLead('${esc(l.id)}')">
+      <span class="rank">#${i+1}</span>
+      <div class="score">${l.score}</div>
+      <h3>${esc(l.projeto)}</h3>
+      <div class="tags">
+        <span class="tag">${esc(l.pais.split("/")[0].trim())}</span>
+        <span class="tag ${faseTag(l.fase)}">${esc(l.faseLabel)}</span>
+        <span class="tag">${esc(trunc(l.plataforma, 28))}</span>
+        ${!l.vendor ? '<span class="tag novendor">sem vendor</span>' : ''}
+        ${l.alerta ? `<span class="tag alerta">${esc(l.alerta)}</span>` : ''}
+      </div>
+    </div>
+  `).join("");
+}
+
+function getFiltered() {
+  const reg = document.getElementById("f-regiao").value;
+  const fase = document.getElementById("f-fase").value;
+  const minScore = parseFloat(document.getElementById("f-score").value) || 0;
+  const q = document.getElementById("f-busca").value.trim().toLowerCase();
+  const onlyNoVendor = document.getElementById("f-novendor").checked;
+
+  let list = LEADS.filter(l => {
+    if (reg !== "Todos" && l.regiao !== reg) return false;
+    if (fase !== "Todas" && l.fase !== fase) return false;
+    if (l.score < minScore) return false;
+    if (onlyNoVendor && l.vendor) return false;
+    if (q) {
+      const hay = [l.projeto, l.produtora, l.plataforma, l.pais, l.tipo, l.demanda, l.decisores, l.fonte, l.alerta]
+        .join(" ").toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  list.sort((a, b) => {
+    let av = a[sortKey], bv = b[sortKey];
+    if (sortKey === "vendor") { av = a.vendor ? 1 : 0; bv = b.vendor ? 1 : 0; }
+    if (typeof av === "string") av = av.toLowerCase();
+    if (typeof bv === "string") bv = bv.toLowerCase();
+    if (av < bv) return -1 * sortDir;
+    if (av > bv) return 1 * sortDir;
+    return b.score - a.score;
+  });
+  return list;
+}
+
+function detailHTML(l) {
+  return `
+    <div class="detail-panel">
+      <div class="detail-field"><label>Tipo / gênero</label><div class="val">${esc(l.tipo)}</div></div>
+      <div class="detail-field"><label>Fase detalhada</label><div class="val">${esc(l.faseLabel)}</div></div>
+      <div class="detail-field"><label>Datas</label><div class="val">${esc(l.datas)}</div></div>
+      <div class="detail-field"><label>Estreia</label><div class="val">${esc(l.estreia)}</div></div>
+      <div class="detail-field"><label>Demanda pós</label><div class="val">${esc(l.demanda)}</div></div>
+      <div class="detail-field"><label>Decisores</label><div class="val">${esc(l.decisores)}</div></div>
+      <div class="detail-field"><label>Vendor / nota</label><div class="val">${esc(l.vendorNota)}</div></div>
+      <div class="detail-field"><label>Confiança</label><div class="val">${esc(l.confianca)}</div></div>
+      ${l.alerta ? `<div class="detail-field"><label>Alerta</label><div class="val" style="color:var(--red)">${esc(l.alerta)}</div></div>` : ""}
+      <div class="detail-field"><label>Fonte</label><div class="val"><a href="${esc(l.fonteUrl)}" target="_blank" rel="noopener">${esc(l.fonte)} ↗</a></div></div>
+      <div class="detail-field"><label>ID</label><div class="val" style="font-family:var(--mono);font-size:.75rem;color:var(--dim)">${esc(l.id)} · ${esc(l.regiao)}</div></div>
+    </div>
+  `;
+}
+
+function renderTable() {
+  const list = getFiltered();
+  document.getElementById("visible-count").textContent = list.length;
+  document.getElementById("empty-msg").style.display = list.length ? "none" : "block";
+
+  const tbody = document.getElementById("leads-tbody");
+  tbody.innerHTML = list.map(l => {
+    const open = expandedId === l.id;
+    return `
+      <tr class="lead-row ${open ? "expanded" : ""}" data-id="${esc(l.id)}" onclick="toggleExpand('${esc(l.id)}')">
+        <td><span class="expand-icon">▶</span> <span class="score-badge ${scoreClass(l.score)}">${l.score}</span></td>
+        <td class="proj-name">${esc(l.projeto)}</td>
+        <td>${esc(trunc(l.pais, 28))}</td>
+        <td><span class="tag ${faseTag(l.fase)}">${esc(l.fase)}</span></td>
+        <td>${esc(trunc(l.produtora, 36))}</td>
+        <td>${esc(trunc(l.plataforma, 32))}</td>
+        <td>${esc(trunc(l.demanda, 48))}</td>
+        <td class="${l.vendor ? "vendor-yes" : "vendor-no"}">${l.vendor ? "Sim*" : "Não"}</td>
+        <td onclick="event.stopPropagation()"><a href="${esc(l.fonteUrl)}" target="_blank" rel="noopener">${esc(trunc(l.fonte, 18))} ↗</a></td>
+      </tr>
+      ${open ? `<tr class="detail-row"><td colspan="9">${detailHTML(l)}</td></tr>` : ""}
+    `;
+  }).join("");
+
+  // Mobile cards
+  const cards = document.getElementById("cards-view");
+  cards.innerHTML = list.map(l => {
+    const open = expandedId === l.id;
+    return `
+      <div class="lead-card-m ${open ? "expanded" : ""}" onclick="toggleExpand('${esc(l.id)}')">
+        <div class="top">
+          <span class="score-badge ${scoreClass(l.score)}">${l.score}</span>
+          <span class="tag ${faseTag(l.fase)}">${esc(l.faseLabel)}</span>
+        </div>
+        <h3>${esc(l.projeto)}</h3>
+        <div class="meta-row">${esc(l.pais)} · ${esc(trunc(l.plataforma, 40))}</div>
+        <div class="meta-row">${esc(trunc(l.produtora, 50))} · <span class="${l.vendor ? "vendor-yes" : "vendor-no"}">${l.vendor ? "vendor sim" : "sem vendor"}</span></div>
+        ${open ? detailHTML(l) : ""}
+      </div>
+    `;
+  }).join("");
+}
+
+function toggleExpand(id) {
+  expandedId = expandedId === id ? null : id;
+  renderTable();
+}
+function scrollToLead(id) {
+  expandedId = id;
+  // reset filters that would hide it
+  document.getElementById("f-regiao").value = "Todos";
+  document.getElementById("f-fase").value = "Todas";
+  document.getElementById("f-score").value = "0";
+  document.getElementById("f-busca").value = "";
+  document.getElementById("f-novendor").checked = false;
+  renderTable();
+  setTimeout(() => {
+    const el = document.querySelector(`[data-id="${id}"]`) || document.querySelector(".lead-card-m.expanded");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, 50);
+}
+
+function toggleExcl() {
+  document.getElementById("excl-box").classList.toggle("open");
+}
+
+function renderExcluidos() {
+  document.getElementById("excl-count").textContent = EXCLUIDOS.length;
+  document.getElementById("excl-tbody").innerHTML = EXCLUIDOS.map(e => `
+    <tr><td>${esc(e.regiao)}</td><td>${esc(e.projeto)}</td><td>${esc(e.motivo)}</td></tr>
+  `).join("");
+}
+
+function renderPlaybook() {
+  document.getElementById("playbook-list").innerHTML = PLAYBOOK.map(p => `<li>${esc(p)}</li>`).join("");
+}
+
+// Events
+["f-regiao","f-fase","f-score","f-novendor"].forEach(id => {
+  document.getElementById(id).addEventListener("change", () => { expandedId = null; renderTable(); });
+});
+document.getElementById("f-busca").addEventListener("input", () => { expandedId = null; renderTable(); });
+
+document.querySelectorAll("th[data-sort]").forEach(th => {
+  th.addEventListener("click", () => {
+    const key = th.dataset.sort;
+    if (sortKey === key) sortDir *= -1;
+    else { sortKey = key; sortDir = key === "score" ? -1 : 1; }
+    document.querySelectorAll("th[data-sort]").forEach(t => {
+      t.classList.toggle("sorted", t.dataset.sort === sortKey);
+      const ind = t.querySelector(".sort-ind");
+      if (t.dataset.sort === sortKey) ind.textContent = sortDir < 0 ? "↓" : "↑";
+      else ind.textContent = "↕";
+    });
+    renderTable();
+  });
+});
+
+initCounts();
+renderUrgent();
+renderTable();
+renderExcluidos();
+renderPlaybook();
+</script>
+</body>
+</html>
