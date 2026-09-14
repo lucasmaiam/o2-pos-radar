@@ -6,7 +6,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>O2 Pós · Radar Comercial · 202609141638</title>
+<title>O2 Pós · Radar Comercial · 202609141642</title>
 <style>
 :root {
   --bg: #0a0a0b;
@@ -500,6 +500,22 @@ td.actions-cell { white-space: nowrap; width: 1%; }
 .arch-empty { font-size: .78rem; color: var(--dim); padding: .5rem 0; }
 
 </style>
+
+<script>
+(function(){
+  var q = new URLSearchParams(location.search);
+  if (q.get("clearDismiss") === "1" || q.get("restore") === "1") {
+    try {
+      localStorage.removeItem("o2radar.dismissedLeads");
+      localStorage.removeItem("o2radar.dismissedFeiras");
+    } catch (e) {}
+    q.delete("clearDismiss"); q.delete("restore");
+    var next = location.pathname + (q.toString() ? "?" + q.toString() : "") + location.hash;
+    location.replace(next || location.pathname);
+  }
+})();
+</script>
+
 </head>
 <body>
 
@@ -507,7 +523,7 @@ td.actions-cell { white-space: nowrap; width: 1%; }
   <div class="header-inner">
     <div class="brand">
       <h1>O2 Pós · Radar Comercial</h1>
-      <div class="meta" id="build-stamp">Build 2026-09-14 16:38 UTC · v202609141638</div>
+      <div class="meta" id="build-stamp">Build 2026-09-14 16:42 UTC · v202609141642</div>
       <div class="meta">Scout 14/09/2026 · fontes públicas · sem contato comercial</div>
     </div>
     <div class="counts">
